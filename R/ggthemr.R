@@ -22,9 +22,12 @@ ggthemr <- function(palette      = 'dust',
                     type         = 'inner', 
                     line_weight  = 0.5,
                     pos          = 1,
-                    envir        = as.environment(pos),
+                    envir        = NULL,
                     set_theme    = TRUE,
                     geom_updates = list()) {
+  
+  envns <- is.null(envir)  # should package namespace be used as default
+  envir <- if (envns) getNamespace("ggthemr") else envir
   
   palette <- load_palette(palette)
   layout  <- load_layout(layout)
@@ -65,23 +68,29 @@ ggthemr <- function(palette      = 'dust',
       update_is_fml <- names(updated_defaults) %in% names(formals(geom_f))
       updated_fmls <- updated_defaults[which(update_is_fml)]
       formals(geom_f)[names(updated_fmls)] <- updated_fmls
-      assign(geom_name, geom_f, envir = envir)
+      if (envns) modify_ggplot2_binding(geom_name, geom_f)
+      else assign(geom_name, geom_f, envir = envir)
       
       # modify default aesthetics with update_geom_defaults
       updated_aes <- updated_defaults[which(!update_is_fml)]
       one_geom_defaults$new[names(updated_aes)] <- updated_aes
       
     } else if (exists(geom_name, envir = envir)) {
-      suppressWarnings(remove(list = geom_name, envir = envir))
+      if (envns) restore_ggplot2_binding(geom_name)
+      else suppressWarnings(remove(list = geom_name, envir = envir))
     }
     
     do.call(what = update_geom_defaults, args = one_geom_defaults)
   }
   
   # setting the scales
-  Map(function(name, f) assign(name, f, envir = envir),
-    names(this_scales),
-    this_scales)
+  if (envns) {
+    Map(modify_ggplot2_binding, names(this_scales), this_scales)
+  } else {
+    Map(function(name, f) assign(name, f, envir = envir), 
+        names(this_scales), 
+        this_scales)
+  }
   
   # saving the inputs for future reference
   set_themr(themr)

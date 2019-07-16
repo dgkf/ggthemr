@@ -5,11 +5,8 @@
 ggthemr_reset <- function () {
   
   if (is_ggthemr_active()) {
-  
-    # removing scales
-    scales <- expand.grid(c('colour', 'fill'), c('continuous', 'discrete', 'gradient'))
-    rm(list = apply(scales, 1L, function (x) sprintf('scale_%s_%s', x[1L], x[2L])), envir = .GlobalEnv)
-    
+    restore_ggplot2_binding()
+      
     # resetting geoms
     current_theme_info <- get_themr()
     for (one_geom_defaults in current_theme_info$geom_defaults$orig) {

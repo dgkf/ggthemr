@@ -8,8 +8,7 @@
 \usage{
 ggthemr(palette = "dust", layout = "clear", spacing = 1,
   text_size = 12, type = "inner", line_weight = 0.5, pos = 1,
-  envir = as.environment(pos), set_theme = TRUE,
-  geom_updates = list())
+  envir = NULL, set_theme = TRUE, geom_updates = list())
 }
 \arguments{
 \item{palette}{Colour scheme by name or ggtheme object.}

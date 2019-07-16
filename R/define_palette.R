@@ -45,6 +45,9 @@ define_palette <- function(swatch, gradient,
   gridline = '#c3c3c3'
 ) {
   
+  if (is.character(gradient)) gradient <- list(colours = gradient)
+  gradient <- do.call(define_gradient, gradient)
+  
   n_text <- length(text)
   if (n_text == 1L) {
     warning('You should supply a vector of length two for the text colour. The first element being the colour used for plots of type "inner". The second when for plots of type "outer".', call. = FALSE)
@@ -72,11 +75,6 @@ define_palette <- function(swatch, gradient,
   if (any(duplicated(sapply(swatch, unname_colour)))) warning('Duplicate plot colours.')
   clash_warning_any('Some plot colours are the same as the background.', swatch, background)
   
-  gradient_colors <- if (is.character(gradient)) gradient 
-    else unlist(gradient[c("colors", "colours", "low", "mid", "high")])
-  
-  clash_warning_any('Some gradient colours are the same as the background.', gradient_colors, background)  
-  
   clash_error("The inner text colour is the same as the background colour. Text will not be visible.", background, text_inner)
   clash_error("The outer text colour is the same as the background colour. Text will not be visible.", background, text_outer)
   
@@ -85,20 +83,20 @@ define_palette <- function(swatch, gradient,
 
   clash_warning("The gridline colour is the same as the background colour. Gridlines will not be visible. If this is desired it is more appropriate to define a new layout where gridlines are not present.", gridline, background)
     
+  clash_warning_any('Some gradient colours are the same as the background.', gradient$colours, background) 
+    
   palette <- list(
     background = background, 
     text = c(inner = text_inner, outer = text_outer), 
     line = c(inner = line_inner, outer = line_outer),
     gridline = gridline,
     swatch = define_swatch(swatch),
-    gradient = define_gradient(gradient)
-  )
+    gradient = gradient)
   
-  if (!all(sapply(unlist(palette), is.character)))
+  if (!all(sapply(unlist(palette[names(palette) != "gradient"]), is.character)))
     stop('You must only supply colours as characters.', call. = FALSE)
   
   class(palette) <- 'ggthemr_palette'
-  
   return (palette)
   
 }
@@ -128,19 +126,3 @@ clash_warning <- function(warning_message, ...)
 
 clash_error <- function(stop_message, ...)
   if (colour_clash(...)) stop(stop_message, call. = FALSE)
-
-define_gradient <- function (dots) {
-  # handle compatibility for single unnamed arg of "low" ("mid") and "high"
-  if (is.character(dots)) dots <- list(colours = dots)
-  
-  is_valid <- any(
-    validate_gradientn_args(dots), 
-    validate_gradient2_args(dots),
-    validate_gradient_args(dots))
-  
-  if (!is_valid)
-    stop('gradient argument list must include arguments "colours", or ',
-      'arguments "low" ("mid") and "high"', call. = FALSE)
-  
-  dots
-}
