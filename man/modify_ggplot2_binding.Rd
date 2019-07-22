@@ -2,10 +2,10 @@
 % Please edit documentation in R/ggplot2_reexports.R
 \name{modify_ggplot2_binding}
 \alias{modify_ggplot2_binding}
-\title{modify a locked binding within an environment (the ggplot2 namespace by default)}
+\title{modify a locked binding within an environment (ggplot2 & ggthemr by default)}
 \usage{
-modify_ggplot2_binding(x, value, ..., envir = getNamespace("ggplot2"))
+modify_ggplot2_binding(x, value, ...)
 }
 \description{
-modify a locked binding within an environment (the ggplot2 namespace by default)
+modify a locked binding within an environment (ggplot2 & ggthemr by default)
 }

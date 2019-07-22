@@ -6,42 +6,33 @@ theme_scales <- function(palette) {
 }
 
 theme_geoms <- function(palette, line_weight) {
-  
   colours <- palette$swatch[-1]
   
-  new_geom_defaults <- list(
-    # Geoms that only require a default colour.  
-    list(geom = 'abline',    new = list(colour = colours[1])),
-    list(geom = 'point',     new = list(colour = colours[1])),
-    list(geom = 'density',   new = list(colour = colours[1])),
-    list(geom = 'errorbar',  new = list(colour = colours[1])),
-    list(geom = 'errorbarh', new = list(colour = colours[1])),
-    list(geom = 'hline',     new = list(colour = colours[1])),
-    list(geom = 'vline',     new = list(colour = colours[1])),
-    list(geom = 'line',      new = list(colour = colours[1])),
-    
-    list(geom = 'text',      new = list(colour = palette$swatch[1])),
-    
-    # Geoms that only require a default fill.
-    list(geom = 'area',      new = list(fill   = colours[1])),
-    list(geom = 'ribbon',    new = list(fill   = colours[1])),
-    list(geom = 'bar',       new = list(fill   = colours[1])),
-    list(geom = 'col',       new = list(fill   = colours[1])),
-    list(geom = 'dotplot',   new = list(fill   = colours[1])),
-    
-    # Special geoms.
-    list(geom = 'boxplot',   new = list(colour = palette$swatch[1], fill = colours[1], size = line_weight)),
-    list(geom = 'smooth',    new = list(colour = colours[2],        fill = colours[2])),
-    list(geom = 'dotplot',   new = list(colour = colours[1],        fill = colours[1]))
-  )
+  geom_names <- grep("^geom_", getNamespaceExports("ggplot2"), value = TRUE)
   
-  names(new_geom_defaults) <- vapply(new_geom_defaults, function(x) x$geom, 'temp', USE.NAMES = FALSE)
+  Filter(Negate(is.null), Map(n = geom_names, function(n) {
+    obj <- layer_call_formal(getExportedValue("ggplot2", n))
+    if (is.null(obj)) return(NULL)
+    
+    new_aes <- obj$default_aes
+    
+    if (!is.null(new_aes$colour) && !is.na(new_aes$colour))
+      new_aes$colour <- colours[1]
+    else if (!is.null(new_aes$fill) && !is.na(new_aes$fill))
+      new_aes$fill <- colours[1]
+    if (all(c("size", "linetype") %in% names(new_aes)))
+      new_aes$size <- line_weight
+    
+    list(geom = obj, new = new_aes)
+  }))
+}
+
+layer_call_formal <- function(geom_f, formal = c("geom", "stat")) {
+  formal <- match.arg(formal, c("geom", "stat"))
+  layer_call <- Filter(function(i) is.call(i) && i[[1]] == "layer", body(geom_f))
+  if (!length(layer_call)) return(NULL)
   
-  orig_geom_defaults <- lapply(names(new_geom_defaults), function(x) {
-    list(geom = x,
-         new  = get(paste0('geom_', x))()$geom$default_aes)
-  })
-  names(orig_geom_defaults) <- names(new_geom_defaults)
-  
-  list(orig = orig_geom_defaults, new = new_geom_defaults)
+  layer_fml  <- as.character(as.list(layer_call)[[1]][formal])
+  if (!layer_fml %in% getNamespaceExports("ggplot2")) return(NULL)
+  getExportedValue("ggplot2", layer_fml)
 }

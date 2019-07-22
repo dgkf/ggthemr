@@ -3,12 +3,34 @@
 \docType{data}
 \name{.ggplot2}
 \alias{.ggplot2}
-\title{create object for ggplot2 backups}
-\format{An object of class \code{list} of length 456.}
+\title{#' create internal placeholders for all ggplot2 exports
+#' @evalNamespace ggplot2_reexports()
+NULL
+for (i in getNamespaceExports("ggplot2")) {
+  assign(i, getExportedValue("ggplot2", i), envir = getNamespace("ggthemr"))
+}
+#' roxygen helper to reexport all ggplot2 functions
+ggplot2_reexports <- function() {
+  exports <- getNamespaceExports("ggplot2")
+  paste(sprintf("export(`%s`)", exports), collapse = "\n")
+}
+placeholder for ggplot2 namespace backup}
+\format{An object of class \code{environment} of length 819.}
 \usage{
 .ggplot2
 }
 \description{
-create object for ggplot2 backups
+#' create internal placeholders for all ggplot2 exports
+#' @evalNamespace ggplot2_reexports()
+NULL
+for (i in getNamespaceExports("ggplot2")) {
+  assign(i, getExportedValue("ggplot2", i), envir = getNamespace("ggthemr"))
+}
+#' roxygen helper to reexport all ggplot2 functions
+ggplot2_reexports <- function() {
+  exports <- getNamespaceExports("ggplot2")
+  paste(sprintf("export(`%s`)", exports), collapse = "\n")
+}
+placeholder for ggplot2 namespace backup
 }
 \keyword{datasets}

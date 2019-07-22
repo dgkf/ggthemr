@@ -4,7 +4,7 @@
 \alias{restore_ggplot2_binding}
 \title{restore a single binding within ggplot2 namespace back to original value}
 \usage{
-restore_ggplot2_binding(x = getNamespaceExports("ggplot2"))
+restore_ggplot2_binding(x = getNamespaceExports("ggplot2"), ...)
 }
 \description{
 restore a single binding within ggplot2 namespace back to original value

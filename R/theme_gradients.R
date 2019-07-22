@@ -45,7 +45,7 @@ theme_gradients_fbody.ggthemr_gradient2 <- function(gradient, aesthetic) {
   })
 }
 
-theme_gradients_fbody.ggthemr_gradient <- function(gradient) {
+theme_gradients_fbody.ggthemr_gradient <- function(gradient, aesthetic) {
   bquote({
     continuous_scale(.(aesthetic), 'ggthemr', 
       scales::seq_gradient_pal(low, high, space), guide = guide, ...)
